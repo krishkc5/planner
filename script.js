@@ -1,316 +1,658 @@
-// Task Manager with Categories
-class TaskManager {
+// Planner Manager - Tennis 8-bit Theme
+class PlannerManager {
     constructor() {
-        this.tasks = this.loadTasks();
+        this.data = this.loadData();
+        this.currentCourseId = null;
+        this.currentWorkId = null;
+        this.currentSimpleType = null;
         this.currentFilter = 'all';
-        this.currentCategory = 'all';
-        this.categoryColors = {
-            courses: '#667eea',
-            work: '#f093fb',
-            career: '#4facfe',
-            research: '#43e97b',
-            fun: '#fa709a'
-        };
         this.init();
     }
 
     init() {
-        this.renderTasks();
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 1000);
+        this.updateStats();
+        this.renderCourses();
+        this.renderWork();
+        this.renderResearch();
+        this.renderSocial();
+        this.updateJobAppsDisplay();
         this.attachEventListeners();
     }
 
-    attachEventListeners() {
-        const form = document.getElementById('task-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.addTask();
-        });
-
-        // Category selector - show subcategory for courses
-        const categorySelect = document.getElementById('task-category');
-        categorySelect.addEventListener('change', (e) => {
-            const subcategoryRow = document.getElementById('subcategory-row');
-            if (e.target.value === 'courses') {
-                subcategoryRow.style.display = 'flex';
-            } else {
-                subcategoryRow.style.display = 'none';
-            }
-        });
-
-        // Filter buttons
-        const filterButtons = document.querySelectorAll('.filter-btn');
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.setFilter(e.target.dataset.filter);
-                filterButtons.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-            });
-        });
-
-        // Category buttons
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.setCategory(e.target.dataset.category);
-                categoryButtons.forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-            });
-        });
-    }
-
-    addTask() {
-        const taskInput = document.getElementById('task-input');
-        const dateInput = document.getElementById('task-date');
-        const timeInput = document.getElementById('task-time');
-        const categoryInput = document.getElementById('task-category');
-        const subcategoryInput = document.getElementById('task-subcategory');
-        const notesInput = document.getElementById('task-notes');
-
-        const task = {
-            id: Date.now(),
-            name: taskInput.value,
-            date: dateInput.value,
-            time: timeInput.value,
-            category: categoryInput.value,
-            subcategory: categoryInput.value === 'courses' ? subcategoryInput.value : null,
-            notes: notesInput.value,
-            completed: false,
-            createdAt: new Date().toISOString()
+    loadData() {
+        const saved = localStorage.getItem('plannerData');
+        return saved ? JSON.parse(saved) : {
+            courses: [],
+            workRoles: [],
+            courseTasks: [],
+            workTasks: [],
+            researchTasks: [],
+            socialTasks: [],
+            jobAppsCount: 0,
+            lastJobAppsReset: new Date().toDateString()
         };
-
-        this.tasks.push(task);
-        this.saveTasks();
-        this.renderTasks();
-
-        // Reset form
-        taskInput.value = '';
-        dateInput.value = '';
-        timeInput.value = '';
-        categoryInput.value = '';
-        subcategoryInput.value = '';
-        notesInput.value = '';
-        document.getElementById('subcategory-row').style.display = 'none';
     }
 
-    deleteTask(id) {
-        this.tasks = this.tasks.filter(task => task.id !== id);
-        this.saveTasks();
-        this.renderTasks();
+    saveData() {
+        localStorage.setItem('plannerData', JSON.stringify(this.data));
     }
 
-    toggleComplete(id) {
-        const task = this.tasks.find(task => task.id === id);
-        if (task) {
-            task.completed = !task.completed;
-            this.saveTasks();
-            this.renderTasks();
-        }
+    updateDateTime() {
+        const now = new Date();
+        const dateOptions = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+        const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+        document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', dateOptions);
+        document.getElementById('current-time').textContent = timeString;
     }
 
-    setFilter(filter) {
-        this.currentFilter = filter;
-        this.renderTasks();
-    }
-
-    setCategory(category) {
-        this.currentCategory = category;
-        this.renderTasks();
-    }
-
-    getFilteredTasks() {
+    updateStats() {
         const today = new Date().toISOString().split('T')[0];
-        let filtered = this.tasks;
+        const allTasks = [
+            ...this.data.courseTasks,
+            ...this.data.workTasks,
+            ...this.data.researchTasks,
+            ...this.data.socialTasks
+        ];
 
-        // Filter by category
-        if (this.currentCategory !== 'all') {
-            filtered = filtered.filter(task => task.category === this.currentCategory);
-        }
+        const tasksToday = allTasks.filter(t => t.dueDate === today && !t.completed).length;
+        const tasksCompleted = allTasks.filter(t => t.completed).length;
+        const tasksTotal = allTasks.length;
 
-        // Filter by time/completion
-        switch (this.currentFilter) {
-            case 'today':
-                filtered = filtered.filter(task => task.date === today && !task.completed);
-                break;
-            case 'upcoming':
-                filtered = filtered.filter(task => task.date > today && !task.completed);
-                break;
-            case 'completed':
-                filtered = filtered.filter(task => task.completed);
-                break;
-        }
-
-        return filtered;
+        document.getElementById('tasks-today').textContent = tasksToday;
+        document.getElementById('tasks-completed').textContent = tasksCompleted;
+        document.getElementById('tasks-total').textContent = tasksTotal;
     }
 
-    renderTasks() {
-        const container = document.getElementById('task-categories-container');
-        const filteredTasks = this.getFilteredTasks();
+    attachEventListeners() {
+        // Manage Courses
+        document.getElementById('manage-courses-btn').addEventListener('click', () => {
+            this.openCoursesModal();
+        });
 
-        if (filteredTasks.length === 0) {
-            container.innerHTML = '<div class="empty-state">No tasks to display</div>';
+        document.getElementById('add-course-btn').addEventListener('click', () => {
+            this.addCourse();
+        });
+
+        // Manage Work
+        document.getElementById('manage-work-btn').addEventListener('click', () => {
+            this.openWorkModal();
+        });
+
+        document.getElementById('add-work-btn').addEventListener('click', () => {
+            this.addWorkRole();
+        });
+
+        // Add buttons for Research and Social
+        document.getElementById('add-research-btn').addEventListener('click', () => {
+            this.openSimpleModal('research');
+        });
+
+        document.getElementById('add-social-btn').addEventListener('click', () => {
+            this.openSimpleModal('social');
+        });
+
+        // Close modal buttons
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.remove('active');
+            });
+        });
+
+        // Click outside modal to close
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Save task buttons
+        document.getElementById('save-task-courses').addEventListener('click', () => {
+            this.saveTaskCourses();
+        });
+
+        document.getElementById('save-task-work').addEventListener('click', () => {
+            this.saveTaskWork();
+        });
+
+        document.getElementById('save-task-simple').addEventListener('click', () => {
+            this.saveTaskSimple();
+        });
+
+        // Priority selectors
+        document.querySelectorAll('.tennis-balls .ball').forEach(ball => {
+            ball.addEventListener('click', (e) => {
+                e.target.closest('.tennis-balls').querySelectorAll('.ball').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+            });
+        });
+
+        // Job apps buttons
+        document.getElementById('add-app-btn').addEventListener('click', () => {
+            this.incrementJobApps();
+        });
+
+        document.getElementById('reset-apps-btn').addEventListener('click', () => {
+            this.resetJobApps();
+        });
+
+        // Quick filters
+        document.querySelectorAll('.quick-filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.quick-filter-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                e.target.classList.add('active');
+                this.currentFilter = e.target.dataset.filter;
+                this.applyFilter();
+            });
+        });
+
+        // Enter key support for inputs
+        document.getElementById('new-course-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addCourse();
+        });
+
+        document.getElementById('new-work-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addWorkRole();
+        });
+    }
+
+    // === COURSES ===
+    openCoursesModal() {
+        const modal = document.getElementById('courses-modal');
+        modal.classList.add('active');
+        this.renderCoursesList();
+    }
+
+    addCourse() {
+        const input = document.getElementById('new-course-input');
+        const name = input.value.trim();
+
+        if (name) {
+            this.data.courses.push({
+                id: Date.now(),
+                name: name,
+                expanded: true
+            });
+            this.saveData();
+            input.value = '';
+            this.renderCoursesList();
+            this.renderCourses();
+        }
+    }
+
+    deleteCourse(id) {
+        this.data.courses = this.data.courses.filter(c => c.id !== id);
+        this.data.courseTasks = this.data.courseTasks.filter(t => t.courseId !== id);
+        this.saveData();
+        this.renderCoursesList();
+        this.renderCourses();
+        this.updateStats();
+    }
+
+    renderCoursesList() {
+        const container = document.getElementById('course-list-manage');
+
+        if (this.data.courses.length === 0) {
+            container.innerHTML = '<div class="empty-state">No courses yet</div>';
             return;
         }
 
-        // Group tasks by category
-        const grouped = {};
-        filteredTasks.forEach(task => {
-            if (!grouped[task.category]) {
-                grouped[task.category] = {};
-            }
-
-            if (task.category === 'courses' && task.subcategory) {
-                if (!grouped[task.category][task.subcategory]) {
-                    grouped[task.category][task.subcategory] = [];
-                }
-                grouped[task.category][task.subcategory].push(task);
-            } else {
-                if (!grouped[task.category]['_main']) {
-                    grouped[task.category]['_main'] = [];
-                }
-                grouped[task.category]['_main'].push(task);
-            }
-        });
-
-        // Render grouped tasks
-        let html = '';
-        const categories = ['courses', 'work', 'career', 'research', 'fun'];
-
-        categories.forEach(category => {
-            if (!grouped[category]) return;
-
-            const categoryTasks = Object.values(grouped[category]).flat();
-            const color = this.categoryColors[category];
-
-            html += `
-                <div class="category-section">
-                    <div class="category-header" style="background: ${color}">
-                        <div class="category-title">
-                            ${this.getCategoryIcon(category)} ${this.capitalize(category)}
-                        </div>
-                        <div class="category-count">${categoryTasks.length}</div>
-                    </div>
-            `;
-
-            if (category === 'courses') {
-                // Render subcategories for courses
-                Object.keys(grouped[category]).sort().forEach(subcategory => {
-                    if (subcategory === '_main') {
-                        html += this.renderTaskList(grouped[category][subcategory]);
-                    } else {
-                        html += `
-                            <div class="subcategory-group">
-                                <div class="subcategory-header">${subcategory}</div>
-                                ${this.renderTaskList(grouped[category][subcategory])}
-                            </div>
-                        `;
-                    }
-                });
-            } else {
-                html += this.renderTaskList(grouped[category]['_main']);
-            }
-
-            html += '</div>';
-        });
-
-        container.innerHTML = html;
-        this.attachTaskEventListeners();
+        container.innerHTML = this.data.courses.map(course => `
+            <div class="manage-list-item">
+                <span>${course.name}</span>
+                <button onclick="planner.deleteCourse(${course.id})">DELETE</button>
+            </div>
+        `).join('');
     }
 
-    renderTaskList(tasks) {
-        if (!tasks || tasks.length === 0) return '';
+    renderCourses() {
+        const container = document.getElementById('courses-container');
 
-        const sortedTasks = tasks.sort((a, b) => {
-            if (a.date && b.date) {
-                return new Date(a.date + ' ' + (a.time || '00:00')) -
-                       new Date(b.date + ' ' + (b.time || '00:00'));
+        if (this.data.courses.length === 0) {
+            container.innerHTML = '<div class="empty-state">Click MANAGE to add courses</div>';
+            return;
+        }
+
+        container.innerHTML = this.data.courses.map(course => {
+            const courseTasks = this.data.courseTasks.filter(t => t.courseId === course.id);
+
+            return `
+                <div class="course-section">
+                    <div class="course-header" onclick="planner.toggleCourseExpand(${course.id})">
+                        <span class="course-name">${course.name}</span>
+                        <span>${course.expanded ? '▼' : '▶'}</span>
+                    </div>
+                    <div class="course-tasks" style="display: ${course.expanded ? 'block' : 'none'}">
+                        ${this.renderTaskList(courseTasks, 'course')}
+                        <button class="add-task-btn" onclick="planner.openCourseTaskModal(${course.id})">+ ADD TASK</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    toggleCourseExpand(id) {
+        const course = this.data.courses.find(c => c.id === id);
+        if (course) {
+            course.expanded = !course.expanded;
+            this.saveData();
+            this.renderCourses();
+        }
+    }
+
+    openCourseTaskModal(courseId) {
+        this.currentCourseId = courseId;
+        const modal = document.getElementById('task-modal-courses');
+        modal.classList.add('active');
+
+        // Reset form
+        document.getElementById('task-name-courses').value = '';
+        document.getElementById('task-date-courses').value = '';
+        document.getElementById('task-type-courses').value = '';
+        document.getElementById('task-notes-courses').value = '';
+        document.querySelectorAll('#task-modal-courses .ball').forEach(b => b.classList.remove('selected'));
+        document.querySelector('#task-modal-courses .ball[data-priority="1"]').classList.add('selected');
+    }
+
+    saveTaskCourses() {
+        const name = document.getElementById('task-name-courses').value.trim();
+        const dueDate = document.getElementById('task-date-courses').value;
+        const type = document.getElementById('task-type-courses').value;
+        const notes = document.getElementById('task-notes-courses').value.trim();
+        const priority = document.querySelector('#task-modal-courses .ball.selected')?.dataset.priority || '1';
+
+        if (!name) {
+            alert('Please enter a task name');
+            return;
+        }
+
+        this.data.courseTasks.push({
+            id: Date.now(),
+            courseId: this.currentCourseId,
+            name: name,
+            dueDate: dueDate,
+            type: type,
+            notes: notes,
+            priority: parseInt(priority),
+            completed: false
+        });
+
+        this.saveData();
+        this.renderCourses();
+        this.updateStats();
+        document.getElementById('task-modal-courses').classList.remove('active');
+    }
+
+    // === WORK ===
+    openWorkModal() {
+        const modal = document.getElementById('work-modal');
+        modal.classList.add('active');
+        this.renderWorkList();
+    }
+
+    addWorkRole() {
+        const input = document.getElementById('new-work-input');
+        const name = input.value.trim();
+
+        if (name) {
+            this.data.workRoles.push({
+                id: Date.now(),
+                name: name,
+                expanded: true
+            });
+            this.saveData();
+            input.value = '';
+            this.renderWorkList();
+            this.renderWork();
+        }
+    }
+
+    deleteWorkRole(id) {
+        this.data.workRoles = this.data.workRoles.filter(w => w.id !== id);
+        this.data.workTasks = this.data.workTasks.filter(t => t.workId !== id);
+        this.saveData();
+        this.renderWorkList();
+        this.renderWork();
+        this.updateStats();
+    }
+
+    renderWorkList() {
+        const container = document.getElementById('work-list-manage');
+
+        if (this.data.workRoles.length === 0) {
+            container.innerHTML = '<div class="empty-state">No work roles yet</div>';
+            return;
+        }
+
+        container.innerHTML = this.data.workRoles.map(work => `
+            <div class="manage-list-item">
+                <span>${work.name}</span>
+                <button onclick="planner.deleteWorkRole(${work.id})">DELETE</button>
+            </div>
+        `).join('');
+    }
+
+    renderWork() {
+        const container = document.getElementById('work-container');
+
+        if (this.data.workRoles.length === 0) {
+            container.innerHTML = '<div class="empty-state">Click MANAGE to add work roles</div>';
+            return;
+        }
+
+        container.innerHTML = this.data.workRoles.map(work => {
+            const workTasks = this.data.workTasks.filter(t => t.workId === work.id);
+
+            return `
+                <div class="work-section">
+                    <div class="work-header" onclick="planner.toggleWorkExpand(${work.id})">
+                        <span class="work-name">${work.name}</span>
+                        <span>${work.expanded ? '▼' : '▶'}</span>
+                    </div>
+                    <div class="work-tasks" style="display: ${work.expanded ? 'block' : 'none'}">
+                        ${this.renderTaskList(workTasks, 'work')}
+                        <button class="add-task-btn" onclick="planner.openWorkTaskModal(${work.id})">+ ADD TASK</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    toggleWorkExpand(id) {
+        const work = this.data.workRoles.find(w => w.id === id);
+        if (work) {
+            work.expanded = !work.expanded;
+            this.saveData();
+            this.renderWork();
+        }
+    }
+
+    openWorkTaskModal(workId) {
+        this.currentWorkId = workId;
+        const modal = document.getElementById('task-modal-work');
+        modal.classList.add('active');
+
+        // Reset form
+        document.getElementById('task-name-work').value = '';
+        document.getElementById('task-date-work').value = '';
+        document.getElementById('task-type-work').value = '';
+        document.getElementById('task-notes-work').value = '';
+        document.querySelectorAll('#task-modal-work .ball').forEach(b => b.classList.remove('selected'));
+        document.querySelector('#task-modal-work .ball[data-priority="1"]').classList.add('selected');
+    }
+
+    saveTaskWork() {
+        const name = document.getElementById('task-name-work').value.trim();
+        const dueDate = document.getElementById('task-date-work').value;
+        const type = document.getElementById('task-type-work').value;
+        const notes = document.getElementById('task-notes-work').value.trim();
+        const priority = document.querySelector('#task-modal-work .ball.selected')?.dataset.priority || '1';
+
+        if (!name) {
+            alert('Please enter a task name');
+            return;
+        }
+
+        this.data.workTasks.push({
+            id: Date.now(),
+            workId: this.currentWorkId,
+            name: name,
+            dueDate: dueDate,
+            type: type,
+            notes: notes,
+            priority: parseInt(priority),
+            completed: false
+        });
+
+        this.saveData();
+        this.renderWork();
+        this.updateStats();
+        document.getElementById('task-modal-work').classList.remove('active');
+    }
+
+    // === RESEARCH & SOCIAL ===
+    openSimpleModal(type) {
+        this.currentSimpleType = type;
+        const modal = document.getElementById('task-modal-simple');
+        const title = type.charAt(0).toUpperCase() + type.slice(1);
+        document.getElementById('simple-modal-title').textContent = `ADD ${title.toUpperCase()} TASK`;
+        modal.classList.add('active');
+
+        // Reset form
+        document.getElementById('task-name-simple').value = '';
+        document.getElementById('task-date-simple').value = '';
+        document.getElementById('task-notes-simple').value = '';
+    }
+
+    saveTaskSimple() {
+        const name = document.getElementById('task-name-simple').value.trim();
+        const dueDate = document.getElementById('task-date-simple').value;
+        const notes = document.getElementById('task-notes-simple').value.trim();
+
+        if (!name) {
+            alert('Please enter a task name');
+            return;
+        }
+
+        const task = {
+            id: Date.now(),
+            name: name,
+            dueDate: dueDate,
+            notes: notes,
+            completed: false
+        };
+
+        if (this.currentSimpleType === 'research') {
+            this.data.researchTasks.push(task);
+            this.renderResearch();
+        } else if (this.currentSimpleType === 'social') {
+            this.data.socialTasks.push(task);
+            this.renderSocial();
+        }
+
+        this.saveData();
+        this.updateStats();
+        document.getElementById('task-modal-simple').classList.remove('active');
+    }
+
+    renderResearch() {
+        const container = document.getElementById('research-container');
+
+        if (this.data.researchTasks.length === 0) {
+            container.innerHTML = '<div class="empty-state">Click + to add research tasks</div>';
+            return;
+        }
+
+        container.innerHTML = this.renderTaskList(this.data.researchTasks, 'research');
+    }
+
+    renderSocial() {
+        const container = document.getElementById('social-container');
+
+        if (this.data.socialTasks.length === 0) {
+            container.innerHTML = '<div class="empty-state">Click + to add social tasks</div>';
+            return;
+        }
+
+        container.innerHTML = this.renderTaskList(this.data.socialTasks, 'social');
+    }
+
+    // === TASK RENDERING ===
+    renderTaskList(tasks, type) {
+        if (!tasks || tasks.length === 0) {
+            return '<div class="empty-state">No tasks yet</div>';
+        }
+
+        // Sort by date, then priority
+        const sorted = tasks.sort((a, b) => {
+            if (a.completed !== b.completed) return a.completed ? 1 : -1;
+            if (a.dueDate && b.dueDate) {
+                const dateCompare = new Date(a.dueDate) - new Date(b.dueDate);
+                if (dateCompare !== 0) return dateCompare;
             }
+            if (a.priority && b.priority) return b.priority - a.priority;
             return 0;
         });
 
-        return `
-            <ul class="task-list">
-                ${sortedTasks.map(task => this.createTaskElement(task)).join('')}
-            </ul>
-        `;
-    }
+        return sorted.map(task => {
+            const priorityBalls = task.priority ? '🎾'.repeat(task.priority) : '';
+            const dateStr = task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+            const typeStr = task.type ? ` • ${task.type}` : '';
 
-    createTaskElement(task) {
-        const dateTime = this.formatDateTime(task.date, task.time);
-        const color = this.categoryColors[task.category];
-
-        return `
-            <li class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}" style="border-left-color: ${color}">
-                <div class="task-content">
-                    <div class="task-name">
-                        ${task.name}
+            return `
+                <div class="task-item ${task.completed ? 'completed' : ''} priority-${task.priority || 1}">
+                    <div class="task-content-left">
+                        <div class="task-text">${task.name}</div>
+                        <div class="task-meta">
+                            ${dateStr}${typeStr}
+                            ${task.notes ? '<br>' + task.notes : ''}
+                        </div>
+                        ${priorityBalls ? `<div class="priority-display">${priorityBalls}</div>` : ''}
                     </div>
-                    ${dateTime ? `<div class="task-datetime">${dateTime}</div>` : ''}
-                    ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
+                    <div class="task-actions-compact">
+                        <button class="task-btn complete-btn" onclick="planner.toggleTask('${type}', ${task.id})">
+                            ${task.completed ? '↺' : '✓'}
+                        </button>
+                        <button class="task-btn delete-btn" onclick="planner.deleteTask('${type}', ${task.id})">✕</button>
+                    </div>
                 </div>
-                <div class="task-actions">
-                    <button class="complete-btn" data-action="complete">
-                        ${task.completed ? 'Undo' : 'Complete'}
-                    </button>
-                    <button class="delete-btn" data-action="delete">Delete</button>
-                </div>
-            </li>
-        `;
+            `;
+        }).join('');
     }
 
-    formatDateTime(date, time) {
-        if (!date) return '';
-
-        const dateObj = new Date(date);
-        const options = { month: 'short', day: 'numeric', year: 'numeric' };
-        let formatted = dateObj.toLocaleDateString('en-US', options);
-
-        if (time) {
-            formatted += ` at ${time}`;
+    toggleTask(type, id) {
+        let tasks;
+        switch(type) {
+            case 'course': tasks = this.data.courseTasks; break;
+            case 'work': tasks = this.data.workTasks; break;
+            case 'research': tasks = this.data.researchTasks; break;
+            case 'social': tasks = this.data.socialTasks; break;
         }
 
-        return formatted;
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.completed = !task.completed;
+            this.saveData();
+            this.renderAll();
+            this.updateStats();
+        }
     }
 
-    getCategoryIcon(category) {
-        const icons = {
-            courses: '📚',
-            work: '💼',
-            career: '🎯',
-            research: '🔬',
-            fun: '🎉'
-        };
-        return icons[category] || '';
+    deleteTask(type, id) {
+        switch(type) {
+            case 'course':
+                this.data.courseTasks = this.data.courseTasks.filter(t => t.id !== id);
+                break;
+            case 'work':
+                this.data.workTasks = this.data.workTasks.filter(t => t.id !== id);
+                break;
+            case 'research':
+                this.data.researchTasks = this.data.researchTasks.filter(t => t.id !== id);
+                break;
+            case 'social':
+                this.data.socialTasks = this.data.socialTasks.filter(t => t.id !== id);
+                break;
+        }
+
+        this.saveData();
+        this.renderAll();
+        this.updateStats();
     }
 
-    capitalize(str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
+    renderAll() {
+        this.renderCourses();
+        this.renderWork();
+        this.renderResearch();
+        this.renderSocial();
     }
 
-    attachTaskEventListeners() {
-        const taskItems = document.querySelectorAll('.task-item');
+    // === JOB APPS TRACKER ===
+    incrementJobApps() {
+        this.checkJobAppsReset();
 
-        taskItems.forEach(item => {
-            const id = parseInt(item.dataset.id);
+        if (this.data.jobAppsCount < 10) {
+            this.data.jobAppsCount++;
+            this.saveData();
+            this.updateJobAppsDisplay();
+        }
+    }
 
-            const completeBtn = item.querySelector('[data-action="complete"]');
-            const deleteBtn = item.querySelector('[data-action="delete"]');
+    resetJobApps() {
+        this.data.jobAppsCount = 0;
+        this.data.lastJobAppsReset = new Date().toDateString();
+        this.saveData();
+        this.updateJobAppsDisplay();
+    }
 
-            completeBtn.addEventListener('click', () => this.toggleComplete(id));
-            deleteBtn.addEventListener('click', () => this.deleteTask(id));
+    checkJobAppsReset() {
+        const today = new Date().toDateString();
+        if (this.data.lastJobAppsReset !== today) {
+            this.data.jobAppsCount = 0;
+            this.data.lastJobAppsReset = today;
+            this.saveData();
+        }
+    }
+
+    updateJobAppsDisplay() {
+        this.checkJobAppsReset();
+        const count = this.data.jobAppsCount;
+        const percentage = (count / 10) * 100;
+
+        document.getElementById('apps-count').textContent = count;
+        document.getElementById('dollar-fill').style.height = percentage + '%';
+    }
+
+    // === FILTERS ===
+    applyFilter() {
+        const today = new Date().toISOString().split('T')[0];
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+        const allTaskElements = document.querySelectorAll('.task-item');
+
+        allTaskElements.forEach(taskEl => {
+            const taskText = taskEl.querySelector('.task-text').textContent;
+            const metaText = taskEl.querySelector('.task-meta').textContent;
+
+            // Extract date from task (this is a simplified approach)
+            const dateMatch = metaText.match(/\w{3} \d+/);
+            let taskDate = null;
+
+            if (dateMatch) {
+                const taskDateObj = new Date(dateMatch[0] + ', ' + new Date().getFullYear());
+                taskDate = taskDateObj.toISOString().split('T')[0];
+            }
+
+            let show = true;
+
+            switch(this.currentFilter) {
+                case 'today':
+                    show = taskDate === today;
+                    break;
+                case 'upcoming':
+                    show = taskDate && taskDate > today;
+                    break;
+                case 'all':
+                default:
+                    show = true;
+            }
+
+            taskEl.style.display = show ? 'flex' : 'none';
         });
-    }
-
-    saveTasks() {
-        localStorage.setItem('tasks', JSON.stringify(this.tasks));
-    }
-
-    loadTasks() {
-        const tasks = localStorage.getItem('tasks');
-        return tasks ? JSON.parse(tasks) : [];
     }
 }
 
-// Initialize the app
+// Initialize
+let planner;
 document.addEventListener('DOMContentLoaded', () => {
-    window.taskManager = new TaskManager();
+    planner = new PlannerManager();
 });
