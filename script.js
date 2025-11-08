@@ -75,8 +75,7 @@ class TaskManager {
             subcategory: categoryInput.value === 'courses' ? subcategoryInput.value : null,
             notes: notesInput.value,
             completed: false,
-            createdAt: new Date().toISOString(),
-            gcalEventId: null
+            createdAt: new Date().toISOString()
         };
 
         this.tasks.push(task);
@@ -91,21 +90,9 @@ class TaskManager {
         subcategoryInput.value = '';
         notesInput.value = '';
         document.getElementById('subcategory-row').style.display = 'none';
-
-        // Sync to Google Calendar if connected
-        if (window.gcalManager && window.gcalManager.isSignedIn()) {
-            window.gcalManager.createEvent(task);
-        }
     }
 
     deleteTask(id) {
-        const task = this.tasks.find(t => t.id === id);
-
-        // Delete from Google Calendar if synced
-        if (task && task.gcalEventId && window.gcalManager && window.gcalManager.isSignedIn()) {
-            window.gcalManager.deleteEvent(task.gcalEventId);
-        }
-
         this.tasks = this.tasks.filter(task => task.id !== id);
         this.saveTasks();
         this.renderTasks();
@@ -117,11 +104,6 @@ class TaskManager {
             task.completed = !task.completed;
             this.saveTasks();
             this.renderTasks();
-
-            // Update in Google Calendar if synced
-            if (task.gcalEventId && window.gcalManager && window.gcalManager.isSignedIn()) {
-                window.gcalManager.updateEvent(task);
-            }
         }
     }
 
@@ -261,7 +243,6 @@ class TaskManager {
                 <div class="task-content">
                     <div class="task-name">
                         ${task.name}
-                        ${task.gcalEventId ? '<span style="color: #4285f4; margin-left: 8px;">📅</span>' : ''}
                     </div>
                     ${dateTime ? `<div class="task-datetime">${dateTime}</div>` : ''}
                     ${task.notes ? `<div class="task-notes">${task.notes}</div>` : ''}
@@ -326,16 +307,6 @@ class TaskManager {
     loadTasks() {
         const tasks = localStorage.getItem('tasks');
         return tasks ? JSON.parse(tasks) : [];
-    }
-
-    // Method to update task with Google Calendar event ID
-    updateTaskWithGcalId(taskId, eventId) {
-        const task = this.tasks.find(t => t.id === taskId);
-        if (task) {
-            task.gcalEventId = eventId;
-            this.saveTasks();
-            this.renderTasks();
-        }
     }
 }
 
