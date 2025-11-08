@@ -10,36 +10,71 @@
     <div class="container">
         <header>
             <h1>My Task Planner</h1>
+            <div class="gcal-section">
+                <button id="gcal-auth-btn" class="gcal-btn">Connect Google Calendar</button>
+                <button id="gcal-sync-btn" class="gcal-btn" style="display: none;">Sync with Calendar</button>
+                <span id="gcal-status"></span>
+            </div>
         </header>
 
         <main>
             <section class="add-task">
                 <h2>Add New Task</h2>
                 <form id="task-form">
-                    <input type="text" id="task-input" placeholder="Enter task name" required>
-                    <input type="date" id="task-date">
-                    <input type="time" id="task-time">
+                    <div class="form-row">
+                        <input type="text" id="task-input" placeholder="Enter task name" required>
+                        <select id="task-category" required>
+                            <option value="">Select Category</option>
+                            <option value="courses">Courses</option>
+                            <option value="work">Work</option>
+                            <option value="career">Career</option>
+                            <option value="research">Research</option>
+                            <option value="fun">Fun</option>
+                        </select>
+                    </div>
+                    <div class="form-row" id="subcategory-row" style="display: none;">
+                        <input type="text" id="task-subcategory" placeholder="Course name (e.g., CS101, Math)">
+                    </div>
+                    <div class="form-row">
+                        <input type="date" id="task-date">
+                        <input type="time" id="task-time">
+                        <textarea id="task-notes" placeholder="Notes (optional)" rows="2"></textarea>
+                    </div>
                     <button type="submit">Add Task</button>
                 </form>
             </section>
 
+            <section class="categories-view">
+                <h2>Manage Categories</h2>
+                <div class="category-filters">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="courses">Courses</button>
+                    <button class="category-btn" data-category="work">Work</button>
+                    <button class="category-btn" data-category="career">Career</button>
+                    <button class="category-btn" data-category="research">Research</button>
+                    <button class="category-btn" data-category="fun">Fun</button>
+                </div>
+            </section>
+
             <section class="tasks">
-                <h2>Your Tasks</h2>
                 <div class="filter-buttons">
                     <button class="filter-btn active" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="today">Today</button>
                     <button class="filter-btn" data-filter="upcoming">Upcoming</button>
                     <button class="filter-btn" data-filter="completed">Completed</button>
                 </div>
-                <ul id="task-list"></ul>
+                <div id="task-categories-container"></div>
             </section>
         </main>
 
         <footer>
-            <p>Task Planner - Google Calendar integration coming soon!</p>
+            <p>Task Planner with Google Calendar Integration</p>
         </footer>
     </div>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://apis.google.com/js/api.js" async defer></script>
+    <script src="gcal.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
