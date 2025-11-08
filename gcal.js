@@ -1,8 +1,8 @@
 // Google Calendar Integration Manager
 class GoogleCalendarManager {
     constructor() {
-        this.CLIENT_ID = 'YOUR_CLIENT_ID_HERE'; // You'll need to replace this
-        this.API_KEY = 'YOUR_API_KEY_HERE'; // You'll need to replace this
+        this.CLIENT_ID = '359970247983-es5igmnd0dgv1vpncjivaipp5str241o.apps.googleusercontent.com';
+        this.API_KEY = 'AIzaSyBjFp9UpRZCnNi5PQjv2vFPknVI9yeStd4';
         this.DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
         this.SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 
