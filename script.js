@@ -17,6 +17,7 @@ class PlannerManager {
         this.renderWork();
         this.renderResearch();
         this.renderSocial();
+        this.renderInternshipTasks();
         this.updateJobAppsDisplay();
         this.attachEventListeners();
     }
@@ -30,6 +31,7 @@ class PlannerManager {
             workTasks: [],
             researchTasks: [],
             socialTasks: [],
+            internshipTasks: [],
             jobAppsCount: 0,
             lastJobAppsReset: new Date().toDateString()
         };
@@ -54,7 +56,8 @@ class PlannerManager {
             ...this.data.courseTasks,
             ...this.data.workTasks,
             ...this.data.researchTasks,
-            ...this.data.socialTasks
+            ...this.data.socialTasks,
+            ...this.data.internshipTasks
         ];
 
         const tasksToday = allTasks.filter(t => t.dueDate === today && !t.completed).length;
@@ -94,6 +97,10 @@ class PlannerManager {
             this.openSimpleModal('social');
         });
 
+        document.getElementById('add-internship-task-btn').addEventListener('click', () => {
+            this.openSimpleModal('internship');
+        });
+
         // Close modal buttons
         document.querySelectorAll('.close-modal').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -124,12 +131,13 @@ class PlannerManager {
         });
 
         // Priority selectors
-        document.querySelectorAll('.tennis-balls .ball').forEach(ball => {
+        document.querySelectorAll('.tennis-balls .ball, .tennis-balls .ball-group').forEach(ball => {
             ball.addEventListener('click', (e) => {
-                e.target.closest('.tennis-balls').querySelectorAll('.ball').forEach(b => {
+                const target = e.target.closest('.ball, .ball-group');
+                target.closest('.tennis-balls').querySelectorAll('.ball, .ball-group').forEach(b => {
                     b.classList.remove('selected');
                 });
-                e.target.classList.add('selected');
+                target.classList.add('selected');
             });
         });
 
@@ -201,14 +209,14 @@ class PlannerManager {
         const container = document.getElementById('course-list-manage');
 
         if (this.data.courses.length === 0) {
-            container.innerHTML = '<div class="empty-state">No courses yet</div>';
+            container.innerHTML = '<div class="empty-state">no courses yet</div>';
             return;
         }
 
         container.innerHTML = this.data.courses.map(course => `
             <div class="manage-list-item">
                 <span>${course.name}</span>
-                <button onclick="planner.deleteCourse(${course.id})">DELETE</button>
+                <button onclick="planner.deleteCourse(${course.id})">delete</button>
             </div>
         `).join('');
     }
@@ -217,7 +225,7 @@ class PlannerManager {
         const container = document.getElementById('courses-container');
 
         if (this.data.courses.length === 0) {
-            container.innerHTML = '<div class="empty-state">Click MANAGE to add courses</div>';
+            container.innerHTML = '<div class="empty-state">click manage to add courses</div>';
             return;
         }
 
@@ -232,7 +240,7 @@ class PlannerManager {
                     </div>
                     <div class="course-tasks" style="display: ${course.expanded ? 'block' : 'none'}">
                         ${this.renderTaskList(courseTasks, 'course')}
-                        <button class="add-task-btn" onclick="planner.openCourseTaskModal(${course.id})">+ ADD TASK</button>
+                        <button class="add-task-btn" onclick="planner.openCourseTaskModal(${course.id})">+ add task</button>
                     </div>
                 </div>
             `;
@@ -328,14 +336,14 @@ class PlannerManager {
         const container = document.getElementById('work-list-manage');
 
         if (this.data.workRoles.length === 0) {
-            container.innerHTML = '<div class="empty-state">No work roles yet</div>';
+            container.innerHTML = '<div class="empty-state">no work roles yet</div>';
             return;
         }
 
         container.innerHTML = this.data.workRoles.map(work => `
             <div class="manage-list-item">
                 <span>${work.name}</span>
-                <button onclick="planner.deleteWorkRole(${work.id})">DELETE</button>
+                <button onclick="planner.deleteWorkRole(${work.id})">delete</button>
             </div>
         `).join('');
     }
@@ -344,7 +352,7 @@ class PlannerManager {
         const container = document.getElementById('work-container');
 
         if (this.data.workRoles.length === 0) {
-            container.innerHTML = '<div class="empty-state">Click MANAGE to add work roles</div>';
+            container.innerHTML = '<div class="empty-state">click manage to add work roles</div>';
             return;
         }
 
@@ -359,7 +367,7 @@ class PlannerManager {
                     </div>
                     <div class="work-tasks" style="display: ${work.expanded ? 'block' : 'none'}">
                         ${this.renderTaskList(workTasks, 'work')}
-                        <button class="add-task-btn" onclick="planner.openWorkTaskModal(${work.id})">+ ADD TASK</button>
+                        <button class="add-task-btn" onclick="planner.openWorkTaskModal(${work.id})">+ add task</button>
                     </div>
                 </div>
             `;
@@ -422,8 +430,7 @@ class PlannerManager {
     openSimpleModal(type) {
         this.currentSimpleType = type;
         const modal = document.getElementById('task-modal-simple');
-        const title = type.charAt(0).toUpperCase() + type.slice(1);
-        document.getElementById('simple-modal-title').textContent = `ADD ${title.toUpperCase()} TASK`;
+        document.getElementById('simple-modal-title').textContent = `add ${type} task`;
         modal.classList.add('active');
 
         // Reset form
@@ -456,6 +463,9 @@ class PlannerManager {
         } else if (this.currentSimpleType === 'social') {
             this.data.socialTasks.push(task);
             this.renderSocial();
+        } else if (this.currentSimpleType === 'internship') {
+            this.data.internshipTasks.push(task);
+            this.renderInternshipTasks();
         }
 
         this.saveData();
@@ -467,7 +477,7 @@ class PlannerManager {
         const container = document.getElementById('research-container');
 
         if (this.data.researchTasks.length === 0) {
-            container.innerHTML = '<div class="empty-state">Click + to add research tasks</div>';
+            container.innerHTML = '<div class="empty-state">click + to add research tasks</div>';
             return;
         }
 
@@ -478,17 +488,28 @@ class PlannerManager {
         const container = document.getElementById('social-container');
 
         if (this.data.socialTasks.length === 0) {
-            container.innerHTML = '<div class="empty-state">Click + to add social tasks</div>';
+            container.innerHTML = '<div class="empty-state">click + to add social tasks</div>';
             return;
         }
 
         container.innerHTML = this.renderTaskList(this.data.socialTasks, 'social');
     }
 
+    renderInternshipTasks() {
+        const container = document.getElementById('internship-tasks-container');
+
+        if (this.data.internshipTasks.length === 0) {
+            container.innerHTML = '<div class="empty-state">add job app tasks</div>';
+            return;
+        }
+
+        container.innerHTML = this.renderTaskList(this.data.internshipTasks, 'internship');
+    }
+
     // === TASK RENDERING ===
     renderTaskList(tasks, type) {
         if (!tasks || tasks.length === 0) {
-            return '<div class="empty-state">No tasks yet</div>';
+            return '<div class="empty-state">no tasks yet</div>';
         }
 
         // Sort by date, then priority
@@ -503,7 +524,7 @@ class PlannerManager {
         });
 
         return sorted.map(task => {
-            const priorityBalls = task.priority ? '🎾'.repeat(task.priority) : '';
+            const priorityBallsHTML = task.priority ? '<div class="ball-8bit"></div>'.repeat(task.priority) : '';
             const dateStr = task.dueDate ? new Date(task.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
             const typeStr = task.type ? ` • ${task.type}` : '';
 
@@ -515,7 +536,7 @@ class PlannerManager {
                             ${dateStr}${typeStr}
                             ${task.notes ? '<br>' + task.notes : ''}
                         </div>
-                        ${priorityBalls ? `<div class="priority-display">${priorityBalls}</div>` : ''}
+                        ${priorityBallsHTML ? `<div class="priority-display">${priorityBallsHTML}</div>` : ''}
                     </div>
                     <div class="task-actions-compact">
                         <button class="task-btn complete-btn" onclick="planner.toggleTask('${type}', ${task.id})">
@@ -535,6 +556,7 @@ class PlannerManager {
             case 'work': tasks = this.data.workTasks; break;
             case 'research': tasks = this.data.researchTasks; break;
             case 'social': tasks = this.data.socialTasks; break;
+            case 'internship': tasks = this.data.internshipTasks; break;
         }
 
         const task = tasks.find(t => t.id === id);
@@ -560,6 +582,9 @@ class PlannerManager {
             case 'social':
                 this.data.socialTasks = this.data.socialTasks.filter(t => t.id !== id);
                 break;
+            case 'internship':
+                this.data.internshipTasks = this.data.internshipTasks.filter(t => t.id !== id);
+                break;
         }
 
         this.saveData();
@@ -572,6 +597,7 @@ class PlannerManager {
         this.renderWork();
         this.renderResearch();
         this.renderSocial();
+        this.renderInternshipTasks();
     }
 
     // === JOB APPS TRACKER ===

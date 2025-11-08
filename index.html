@@ -15,7 +15,7 @@
     <div class="main-container">
         <!-- Left Sidebar -->
         <aside class="sidebar">
-            <div class="logo">🎾 PLANNER</div>
+            <div class="logo">planner</div>
 
             <div class="datetime-widget">
                 <div id="current-date" class="date-display"></div>
@@ -23,25 +23,25 @@
             </div>
 
             <div class="stats-widget">
-                <h3>STATS</h3>
+                <h3>stats</h3>
                 <div class="stat-item">
-                    <span class="stat-label">TASKS TODAY</span>
+                    <span class="stat-label">tasks today</span>
                     <span id="tasks-today" class="stat-value">0</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">COMPLETED</span>
+                    <span class="stat-label">completed</span>
                     <span id="tasks-completed" class="stat-value">0</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">TOTAL</span>
+                    <span class="stat-label">total</span>
                     <span id="tasks-total" class="stat-value">0</span>
                 </div>
             </div>
 
             <div class="quick-filters">
-                <button class="quick-filter-btn active" data-filter="all">ALL</button>
-                <button class="quick-filter-btn" data-filter="today">TODAY</button>
-                <button class="quick-filter-btn" data-filter="upcoming">UPCOMING</button>
+                <button class="quick-filter-btn active" data-filter="all">all</button>
+                <button class="quick-filter-btn" data-filter="today">today</button>
+                <button class="quick-filter-btn" data-filter="upcoming">upcoming</button>
             </div>
         </aside>
 
@@ -50,8 +50,8 @@
             <!-- Courses Column -->
             <section class="column courses-column">
                 <div class="column-header">
-                    <h2>📚 COURSES</h2>
-                    <button id="manage-courses-btn" class="manage-btn">MANAGE</button>
+                    <h2>courses</h2>
+                    <button id="manage-courses-btn" class="manage-btn">manage</button>
                 </div>
 
                 <div id="courses-container" class="courses-list"></div>
@@ -59,11 +59,11 @@
                 <!-- Manage Courses Modal -->
                 <div id="courses-modal" class="modal">
                     <div class="modal-content">
-                        <h3>MANAGE COURSES</h3>
-                        <input type="text" id="new-course-input" placeholder="Course name">
-                        <button id="add-course-btn">ADD COURSE</button>
+                        <h3>manage courses</h3>
+                        <input type="text" id="new-course-input" placeholder="course name">
+                        <button id="add-course-btn">add course</button>
                         <div id="course-list-manage"></div>
-                        <button class="close-modal">CLOSE</button>
+                        <button class="close-modal">close</button>
                     </div>
                 </div>
             </section>
@@ -71,38 +71,51 @@
             <!-- Work Column -->
             <section class="column work-column">
                 <div class="column-header">
-                    <h2>💼 WORK</h2>
-                    <button id="manage-work-btn" class="manage-btn">MANAGE</button>
+                    <h2>work</h2>
+                    <button id="manage-work-btn" class="manage-btn">manage</button>
                 </div>
 
                 <div id="work-container" class="work-list"></div>
 
                 <!-- Internship Tracker -->
                 <div class="internship-tracker">
-                    <h3>💰 DAILY JOB APPS</h3>
-                    <div class="dollar-container">
-                        <svg id="dollar-svg" viewBox="0 0 100 140" class="dollar-sign">
-                            <path id="dollar-path" d="M 30 20 L 70 20 L 70 30 L 30 30 Z M 20 30 L 80 30 L 80 60 L 20 60 Z M 30 60 L 70 60 L 70 70 L 30 70 Z M 20 70 L 80 70 L 80 100 L 20 100 Z M 30 100 L 70 100 L 70 110 L 30 110 Z M 45 10 L 55 10 L 55 130 L 45 130 Z" fill="none" stroke="#8B4513" stroke-width="3"/>
-                        </svg>
-                        <div id="dollar-fill" class="dollar-fill"></div>
-                    </div>
-                    <div class="progress-text">
-                        <span id="apps-count">0</span>/10 APPLICATIONS
-                    </div>
-                    <div class="app-buttons">
-                        <button id="add-app-btn" class="app-btn">+1 APP</button>
-                        <button id="reset-apps-btn" class="app-btn-small">RESET</button>
+                    <h3>daily job apps</h3>
+                    <div class="tracker-content">
+                        <div class="dollar-side">
+                            <div class="dollar-container">
+                                <svg id="dollar-svg" viewBox="0 0 100 140" class="dollar-sign">
+                                    <!-- Dollar sign path -->
+                                    <path d="M 50 5 L 50 135" stroke="#8B4513" stroke-width="4" fill="none"/>
+                                    <!-- Top curve -->
+                                    <path d="M 70 25 Q 70 15, 50 15 Q 30 15, 30 25 Q 30 35, 50 40" stroke="#8B4513" stroke-width="4" fill="none"/>
+                                    <!-- Bottom curve -->
+                                    <path d="M 50 40 Q 70 45, 70 55 Q 70 65, 50 65 Q 30 65, 30 75 Q 30 85, 50 85" stroke="#8B4513" stroke-width="4" fill="none"/>
+                                </svg>
+                                <div id="dollar-fill" class="dollar-fill"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="apps-count">0</span>/10 applications
+                            </div>
+                            <div class="app-buttons">
+                                <button id="add-app-btn" class="app-btn">+1 app</button>
+                                <button id="reset-apps-btn" class="app-btn-small">reset</button>
+                            </div>
+                        </div>
+                        <div class="tracker-tasks">
+                            <div id="internship-tasks-container"></div>
+                            <button id="add-internship-task-btn" class="add-task-btn">+ add task</button>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Manage Work Modal -->
                 <div id="work-modal" class="modal">
                     <div class="modal-content">
-                        <h3>MANAGE WORK ROLES</h3>
-                        <input type="text" id="new-work-input" placeholder="Role/Company name">
-                        <button id="add-work-btn">ADD ROLE</button>
+                        <h3>manage work roles</h3>
+                        <input type="text" id="new-work-input" placeholder="role/company name">
+                        <button id="add-work-btn">add role</button>
                         <div id="work-list-manage"></div>
-                        <button class="close-modal">CLOSE</button>
+                        <button class="close-modal">close</button>
                     </div>
                 </div>
             </section>
@@ -112,7 +125,7 @@
                 <!-- Research Section (Top Half) -->
                 <div class="split-section research-section">
                     <div class="column-header">
-                        <h2>🔬 RESEARCH</h2>
+                        <h2>research</h2>
                         <button id="add-research-btn" class="add-btn">+</button>
                     </div>
                     <div id="research-container" class="task-container"></div>
@@ -121,7 +134,7 @@
                 <!-- Social Section (Bottom Half) -->
                 <div class="split-section social-section">
                     <div class="column-header">
-                        <h2>🎉 SOCIAL</h2>
+                        <h2>social</h2>
                         <button id="add-social-btn" class="add-btn">+</button>
                     </div>
                     <div id="social-container" class="task-container"></div>
@@ -133,66 +146,66 @@
     <!-- Task Modal for Courses -->
     <div id="task-modal-courses" class="modal">
         <div class="modal-content">
-            <h3>ADD TASK</h3>
-            <input type="text" id="task-name-courses" placeholder="Task name" required>
+            <h3>add task</h3>
+            <input type="text" id="task-name-courses" placeholder="task name" required>
             <input type="date" id="task-date-courses">
             <div class="priority-selector">
-                <label>PRIORITY:</label>
+                <label>priority:</label>
                 <div class="tennis-balls">
-                    <span class="ball" data-priority="1">🎾</span>
-                    <span class="ball" data-priority="2">🎾🎾</span>
-                    <span class="ball" data-priority="3">🎾🎾🎾</span>
+                    <div class="ball" data-priority="1"></div>
+                    <div class="ball-group" data-priority="2"><div class="ball"></div><div class="ball"></div></div>
+                    <div class="ball-group" data-priority="3"><div class="ball"></div><div class="ball"></div><div class="ball"></div></div>
                 </div>
             </div>
             <select id="task-type-courses">
-                <option value="">Task type</option>
-                <option value="assignment">Assignment</option>
-                <option value="revision">Revision</option>
-                <option value="exam">Exam</option>
-                <option value="project">Project</option>
+                <option value="">task type</option>
+                <option value="assignment">assignment</option>
+                <option value="revision">revision</option>
+                <option value="exam">exam</option>
+                <option value="project">project</option>
             </select>
-            <textarea id="task-notes-courses" placeholder="Notes"></textarea>
-            <button id="save-task-courses">ADD TASK</button>
-            <button class="close-modal">CANCEL</button>
+            <textarea id="task-notes-courses" placeholder="notes"></textarea>
+            <button id="save-task-courses">add task</button>
+            <button class="close-modal">cancel</button>
         </div>
     </div>
 
     <!-- Task Modal for Work -->
     <div id="task-modal-work" class="modal">
         <div class="modal-content">
-            <h3>ADD TASK</h3>
-            <input type="text" id="task-name-work" placeholder="Task name" required>
+            <h3>add task</h3>
+            <input type="text" id="task-name-work" placeholder="task name" required>
             <input type="date" id="task-date-work">
             <div class="priority-selector">
-                <label>PRIORITY:</label>
+                <label>priority:</label>
                 <div class="tennis-balls">
-                    <span class="ball" data-priority="1">🎾</span>
-                    <span class="ball" data-priority="2">🎾🎾</span>
-                    <span class="ball" data-priority="3">🎾🎾🎾</span>
+                    <div class="ball" data-priority="1"></div>
+                    <div class="ball-group" data-priority="2"><div class="ball"></div><div class="ball"></div></div>
+                    <div class="ball-group" data-priority="3"><div class="ball"></div><div class="ball"></div><div class="ball"></div></div>
                 </div>
             </div>
             <select id="task-type-work">
-                <option value="">Task type</option>
-                <option value="meeting">Meeting</option>
-                <option value="deadline">Deadline</option>
-                <option value="review">Review</option>
-                <option value="other">Other</option>
+                <option value="">task type</option>
+                <option value="meeting">meeting</option>
+                <option value="deadline">deadline</option>
+                <option value="review">review</option>
+                <option value="other">other</option>
             </select>
-            <textarea id="task-notes-work" placeholder="Notes"></textarea>
-            <button id="save-task-work">ADD TASK</button>
-            <button class="close-modal">CANCEL</button>
+            <textarea id="task-notes-work" placeholder="notes"></textarea>
+            <button id="save-task-work">add task</button>
+            <button class="close-modal">cancel</button>
         </div>
     </div>
 
-    <!-- Simple Task Modal for Research/Social -->
+    <!-- Simple Task Modal for Research/Social/Internship -->
     <div id="task-modal-simple" class="modal">
         <div class="modal-content">
-            <h3 id="simple-modal-title">ADD TASK</h3>
-            <input type="text" id="task-name-simple" placeholder="Task name" required>
+            <h3 id="simple-modal-title">add task</h3>
+            <input type="text" id="task-name-simple" placeholder="task name" required>
             <input type="date" id="task-date-simple">
-            <textarea id="task-notes-simple" placeholder="Notes"></textarea>
-            <button id="save-task-simple">ADD TASK</button>
-            <button class="close-modal">CANCEL</button>
+            <textarea id="task-notes-simple" placeholder="notes"></textarea>
+            <button id="save-task-simple">add task</button>
+            <button class="close-modal">cancel</button>
         </div>
     </div>
 

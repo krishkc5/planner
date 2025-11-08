@@ -34,10 +34,8 @@ body {
 .sidebar {
     width: 250px;
     background: #FFF8DC;
-    border-right: 6px solid #8B4513;
     padding: 20px;
     overflow-y: auto;
-    box-shadow: 6px 0 0 #FFEB3B;
 }
 
 .logo {
@@ -46,17 +44,16 @@ body {
     text-align: center;
     padding: 15px;
     background: linear-gradient(135deg, #FFEB3B 0%, #FFC107 100%);
-    border: 4px solid #8B4513;
     margin-bottom: 20px;
-    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .datetime-widget {
     background: #1a5f1a;
-    border: 4px solid #8B4513;
     padding: 15px;
     margin-bottom: 20px;
     text-align: center;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .date-display {
@@ -73,9 +70,9 @@ body {
 
 .stats-widget {
     background: #E8F5E9;
-    border: 4px solid #1a5f1a;
     padding: 15px;
     margin-bottom: 20px;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
 }
 
 .stats-widget h3 {
@@ -110,25 +107,25 @@ body {
 .quick-filter-btn {
     padding: 10px;
     background: white;
-    border: 3px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.5rem;
     cursor: pointer;
     transition: all 0.1s;
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .quick-filter-btn:hover {
     background: #FFEB3B;
     transform: translate(1px, 1px);
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .quick-filter-btn.active {
     background: #1a5f1a;
     color: #FFEB3B;
-    box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.3);
     transform: translate(3px, 3px);
+    box-shadow: none;
 }
 
 /* ===== CONTENT GRID ===== */
@@ -143,21 +140,16 @@ body {
 
 .column {
     background: #FFF8DC;
-    border: 6px solid #8B4513;
-    box-shadow:
-        0 0 0 3px #FFEB3B,
-        0 0 0 6px #8B4513,
-        6px 6px 0 rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
 }
 
 .column-header {
     background: linear-gradient(135deg, #1a5f1a 0%, #2d8b2d 100%);
     color: #FFEB3B;
     padding: 15px;
-    border-bottom: 4px solid #8B4513;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -171,18 +163,18 @@ body {
     padding: 8px 12px;
     background: #FFEB3B;
     color: #1a5f1a;
-    border: 3px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.5rem;
     cursor: pointer;
     transition: all 0.1s;
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
 .manage-btn:hover, .add-btn:hover {
     background: #FFC107;
     transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .manage-btn:active, .add-btn:active {
@@ -199,9 +191,9 @@ body {
 
 .course-section, .work-section {
     background: #E8F5E9;
-    border: 4px solid #1a5f1a;
     margin-bottom: 15px;
     overflow: hidden;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .course-header, .work-header {
@@ -228,7 +220,6 @@ body {
 
 .task-item {
     background: white;
-    border: 3px solid #8B4513;
     border-left: 6px solid #FFEB3B;
     padding: 10px;
     margin-bottom: 8px;
@@ -236,6 +227,7 @@ body {
     justify-content: space-between;
     align-items: flex-start;
     transition: all 0.2s;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .task-item:hover {
@@ -270,12 +262,40 @@ body {
 }
 
 .priority-display {
-    margin-top: 5px;
+    margin-top: 8px;
+    display: flex;
+    gap: 4px;
 }
 
-.priority-1 { filter: grayscale(0%); }
-.priority-2 { filter: hue-rotate(30deg) saturate(1.5); }
-.priority-3 { filter: hue-rotate(330deg) saturate(2); }
+/* Custom 8-bit Tennis Balls */
+.priority-display .ball-8bit {
+    width: 12px;
+    height: 12px;
+    background: #CCFF00;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.priority-display .ball-8bit::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 2px;
+    width: 8px;
+    height: 2px;
+    background: white;
+    opacity: 0.5;
+    border-radius: 2px;
+}
+
+.priority-2 .priority-display .ball-8bit {
+    background: #FFB347;
+}
+
+.priority-3 .priority-display .ball-8bit {
+    background: #FF6B6B;
+}
 
 .task-actions-compact {
     display: flex;
@@ -285,11 +305,12 @@ body {
 
 .task-btn {
     padding: 4px 8px;
-    border: 2px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.4rem;
     cursor: pointer;
     transition: all 0.1s;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .complete-btn {
@@ -304,6 +325,7 @@ body {
 
 .task-btn:hover {
     transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 
 .add-task-btn {
@@ -311,21 +333,23 @@ body {
     padding: 8px;
     background: #FFEB3B;
     color: #1a5f1a;
-    border: 3px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.5rem;
     cursor: pointer;
     margin-top: 5px;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .add-task-btn:hover {
     background: #FFC107;
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* ===== INTERNSHIP TRACKER ===== */
 .internship-tracker {
     background: #E8F5E9;
-    border-top: 4px solid #8B4513;
     padding: 15px;
     text-align: center;
 }
@@ -336,13 +360,25 @@ body {
     margin-bottom: 15px;
 }
 
+.tracker-content {
+    display: flex;
+    gap: 15px;
+}
+
+.dollar-side {
+    flex: 0 0 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .dollar-container {
     position: relative;
     width: 100px;
-    height: 140px;
+    height: 100px;
     margin: 0 auto 15px;
-    border: 4px solid #8B4513;
     background: white;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .dollar-sign {
@@ -364,13 +400,13 @@ body {
 }
 
 .progress-text {
-    font-size: 0.6rem;
+    font-size: 0.5rem;
     color: #1a5f1a;
     margin-bottom: 10px;
 }
 
 #apps-count {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: bold;
 }
 
@@ -381,34 +417,49 @@ body {
 }
 
 .app-btn {
-    padding: 10px 20px;
+    padding: 8px 12px;
     background: #2d8b2d;
     color: white;
-    border: 3px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     cursor: pointer;
-    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .app-btn:hover {
     background: #1a5f1a;
     transform: translate(1px, 1px);
-    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .app-btn-small {
-    padding: 8px 12px;
+    padding: 6px 10px;
     background: #ff4444;
     color: white;
-    border: 3px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.4rem;
     cursor: pointer;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .app-btn-small:hover {
     background: #cc0000;
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.tracker-tasks {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#internship-tasks-container {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
 }
 
 /* ===== SPLIT COLUMN (Research & Social) ===== */
@@ -422,11 +473,11 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    border-bottom: 3px solid #8B4513;
+    background: #E8F5E9;
 }
 
-.split-section:last-child {
-    border-bottom: none;
+.split-section:first-child {
+    margin-bottom: 3px;
 }
 
 .task-container {
@@ -455,14 +506,10 @@ body {
 
 .modal-content {
     background: #FFF8DC;
-    border: 6px solid #8B4513;
-    box-shadow:
-        0 0 0 4px #FFEB3B,
-        0 0 0 8px #8B4513,
-        0 10px 40px rgba(0, 0, 0, 0.5);
     padding: 30px;
     max-width: 500px;
     width: 90%;
+    box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.3);
 }
 
 .modal-content h3 {
@@ -478,10 +525,11 @@ body {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
-    border: 4px solid #8B4513;
+    border: none;
     background: white;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.6rem;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2);
 }
 
 .modal-content textarea {
@@ -505,24 +553,72 @@ body {
     display: flex;
     gap: 15px;
     justify-content: center;
+    align-items: center;
+}
+
+/* Custom 8-bit Tennis Ball Selector */
+.tennis-balls .ball,
+.tennis-balls .ball-group {
+    cursor: pointer;
+    padding: 8px;
+    transition: all 0.2s;
+    display: flex;
+    gap: 4px;
 }
 
 .tennis-balls .ball {
-    cursor: pointer;
-    padding: 8px;
-    border: 3px solid transparent;
-    transition: all 0.2s;
-    font-size: 1rem;
+    width: 24px;
+    height: 24px;
+    background: #CCFF00;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: inset -3px -3px 0 rgba(0, 0, 0, 0.3), inset 3px 3px 0 rgba(255, 255, 255, 0.4);
 }
 
-.tennis-balls .ball:hover {
-    border-color: #8B4513;
+.tennis-balls .ball::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 4px;
+    width: 16px;
+    height: 4px;
+    background: white;
+    opacity: 0.6;
+    border-radius: 4px;
+}
+
+.tennis-balls .ball::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    left: 4px;
+    width: 16px;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.tennis-balls .ball-group .ball {
+    width: 20px;
+    height: 20px;
+}
+
+.tennis-balls .ball-group .ball::before {
+    top: 5px;
+    left: 3px;
+    width: 14px;
+    height: 3px;
+}
+
+.tennis-balls .ball:hover,
+.tennis-balls .ball-group:hover {
     background: #E8F5E9;
+    transform: scale(1.1);
 }
 
-.tennis-balls .ball.selected {
-    border-color: #1a5f1a;
+.tennis-balls .ball.selected,
+.tennis-balls .ball-group.selected {
     background: #FFEB3B;
+    transform: scale(1.15);
 }
 
 .modal-content button {
@@ -531,18 +627,18 @@ body {
     margin-top: 10px;
     background: linear-gradient(135deg, #FFEB3B 0%, #FFC107 100%);
     color: #1a5f1a;
-    border: 4px solid #8B4513;
+    border: none;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.6rem;
     cursor: pointer;
-    box-shadow: 4px 4px 0 #8B4513;
+    box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
     transition: all 0.1s;
 }
 
 .modal-content button:hover {
     background: linear-gradient(135deg, #FFC107 0%, #FFEB3B 100%);
     transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #8B4513;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .modal-content button:active {
@@ -561,12 +657,12 @@ body {
 
 .manage-list-item {
     background: white;
-    border: 3px solid #8B4513;
     padding: 10px;
     margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
 }
 
 .manage-list-item span {
@@ -601,13 +697,9 @@ body {
         flex-direction: row;
     }
 
-    .split-section {
-        border-bottom: none;
-        border-right: 3px solid #8B4513;
-    }
-
-    .split-section:last-child {
-        border-right: none;
+    .split-section:first-child {
+        margin-bottom: 0;
+        margin-right: 3px;
     }
 }
 
@@ -618,8 +710,6 @@ body {
 
     .sidebar {
         width: 100%;
-        border-right: none;
-        border-bottom: 6px solid #8B4513;
     }
 
     .content-grid {
@@ -631,8 +721,16 @@ body {
         flex-direction: column;
     }
 
-    .split-section {
-        border-right: none;
-        border-bottom: 3px solid #8B4513;
+    .split-section:first-child {
+        margin-right: 0;
+        margin-bottom: 3px;
+    }
+
+    .tracker-content {
+        flex-direction: column;
+    }
+
+    .dollar-side {
+        flex: 1;
     }
 }
