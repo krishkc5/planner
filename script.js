@@ -633,7 +633,18 @@ class PlannerManager {
         const percentage = (count / 10) * 100;
 
         document.getElementById('apps-count').textContent = count;
-        document.getElementById('dollar-fill').style.height = percentage + '%';
+        const progressFill = document.getElementById('progress-fill');
+        const progressContainer = progressFill.parentElement;
+
+        progressFill.style.height = percentage + '%';
+
+        // Add celebration animation when completed
+        if (count === 10) {
+            progressContainer.classList.add('completed');
+            setTimeout(() => {
+                progressContainer.classList.remove('completed');
+            }, 600);
+        }
     }
 
     // === FILTERS ===
